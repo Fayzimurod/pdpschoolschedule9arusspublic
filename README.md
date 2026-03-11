@@ -85,3 +85,21 @@ Dark theme:
 1. Clone the repository
 ```bash
 git clone https://github.com/yourusername/schedule-app.git -->
+
+## 💡 Usage
+
+- **View Schedule** - The main table shows the weekly timetable
+- **Switch Themes** - Click the theme toggle button (LIGHT/DARK)
+- **Navigate Calendar** - Use ← and → arrows to change months
+- **Check Current Time** - Top-left corner shows real-time clock
+
+## 🔧 Customization
+
+### Modify Schedule
+Update the table structure in `index.html` to change classes, times, or days.
+
+## 🙏 Acknowledgments
+
+- Schedule data formatted with [FET](https://www.lalescu.ro/liviu/fet/) (Free Timetabling Software)
+- Inspiration from modern dashboard designs
+- Icons and design patterns from the web community

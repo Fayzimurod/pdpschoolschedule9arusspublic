@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="image.png">
+    <title>Schedule</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+            transition: background-color 0.3s ease, color 0.2s ease, border-color 0.3s ease;
+        }
+        /* *::selection{background-color: darkviolet;color: limegreen;} */
+        *::selection{background-color: seagreen;color: snow;}
+        *:hover::selection{background-color: limegreen;color: black;}
+        
+        /* Light Theme (default) */
+        body.light-theme {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        body.light-theme .containerCalendar {
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        body.light-theme table td {
+            border-color: black;
+            color: #333;
+        }
+        body.light-theme .time {
+            color: #333;
+        }
+        body.light-theme .date {
+            color: #626262;
+        }
+        body.light-theme .calendar-header h3 {
+            color: #333;
+        }
+        body.light-theme .calendar-header button {
+            background: #333;
+            color: white;
+        }
+        body.light-theme .calendar-header button:hover {
+            background: #555;
+        }
+        body.light-theme .weekdays {
+            color: #666;
+        }
+        body.light-theme .day.today {
+            background: #333;
+            color: white;
+        }
+        /* Hover эффекты для Light темы */
+        body.light-theme table td:hover {
+            background-color: rgba(46, 139, 86, 0.2);
+            /* background-color: rgba(0, 0, 0, 0.05); */
+            /* transform: scale(1.02); */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        body.light-theme .day:hover:not(.today) {
+            /* background-color: #e0e0e0; */
+            background-color: #bebebe;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            cursor: pointer;
+        }
+
+        /* Dark Theme */
+        body.dark-theme {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        body.dark-theme .containerCalendar {
+            background: #2d2d2d;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        body.dark-theme table td {
+            border-color: #555;
+            color: #e0e0e0;
+        }
+        body.dark-theme .time {
+            color: #ffffff;
+        }
+        body.dark-theme .date {
+            color: #b0b0b0;
+        }
+        body.dark-theme .calendar-header h3 {
+            color: #e0e0e0;
+        }
+        body.dark-theme .calendar-header button {
+            background: #555;
+            color: white;
+        }
+        body.dark-theme .calendar-header button:hover {
+            background: #777;
+        }
+        body.dark-theme .weekdays {
+            color: #b0b0b0;
+        }
+        body.dark-theme .day {
+            color: #e0e0e0;
+        }
+        body.dark-theme .day.today {
+            background: #555;
+            color: white;
+        }
+        body.dark-theme .day.other-month {
+            opacity: 0.2;
+        }
+        /* Hover эффекты для Dark темы */
+        body.dark-theme table td:hover {
+            background-color: rgba(46, 139, 86, 0.25);
+            /* background-color: rgba(220, 20, 60, 0.15); */
+            /* transform: scale(1.02); */
+            box-shadow: 0 2px 8px rgba(255,255,255,0.1);
+            transition: all 0.2s ease;
+        }
+        body.dark-theme .day:hover:not(.today) {
+            background-color: #444;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(255,255,255,0.15);
+            cursor: pointer;
+        }
+
+        /* Общие hover эффекты для таблицы */
+        table td {
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        table td:hover {
+            z-index: 10;
+        }
+        
+        /* Специальный эффект для ячеек с rowspan */
+        table td[rowspan]:hover {
+            background-color: rgba(100, 100, 255, 0.15) !important;
+            border-color: currentColor;
+        }
+        
+        /* Hover эффект для заголовков таблицы */
+        thead td:hover {
+            background-color: rgba(0, 0, 0, 0.2) !important;
+            letter-spacing: 2px;
+        }
+        
+        /* Hover эффект для первого столбца (время) */
+        tbody td:first-child:hover:not(:last-child) {
+            /* background-color: plum; */
+            background-color: rgba(3, 242, 255, 0.2) !important;
+            font-weight: 700;
+        }
+        
+        /* Hover эффект для строки BREAK */
+        .x-break:hover {
+            background-color: rgba(255, 0, 0, 0.1) !important;
+            letter-spacing: 10px;
+        }
+
+        /* Hover эффекты для календаря */
+        .day {
+            transition: all 0.2s ease;
+        }
+        
+        /* Эффект для дней календаря */
+        .day:hover:not(.other-month):not(.today) {
+            transform: scale(1.1);
+            background-color: rgba(128, 128, 128, 0.5) !important;
+            z-index: 10;
+            /* border-radius: 50%; */
+        }
+        
+        /* Hover эффект для сегодняшнего дня */
+        .day.today:hover {
+            filter: brightness(1.2);
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        /* Hover эффект для дней другого месяца */
+        .day.other-month:hover {
+            opacity: 0.5;
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+        
+        /* Hover эффект для кнопок календаря */
+        .calendar-header button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        /* Анимация для названия месяца */
+        .calendar-header h3 {
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-header h3:hover {
+            letter-spacing: 2px;
+            transform: scale(1.05);
+        }
+        
+        /* Hover эффект для дней недели */
+        .weekdays div {
+            transition: all 0.2s ease;
+        }
+        
+        .weekdays div:hover {
+            transform: translateY(-2px);
+            color: #ff1e00;
+            font-weight: 900;
+        }
+
+        /* Theme switcher button */
+        .theme-switch-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .theme-switch button {
+            background: linear-gradient(135deg, #333, #555);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid transparent;
+        }
+        
+        body.light-theme .theme-switch button {
+            background: linear-gradient(135deg, #333, #444);
+            color: white;
+        }
+        
+        body.dark-theme .theme-switch button {
+            background: linear-gradient(135deg, #555, #666);
+            color: white;
+        }
+        
+        .theme-switch button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        body{
+            margin: 30px auto;
+        }
+
+        .container{
+            margin: 0 auto;
+            width: 95%;
+            max-width: 1400px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin: 20px 0 30px;
+        }
+        
+        table {
+            width: 100%;
+            min-width: 1000px;
+            border-collapse: collapse;
+        }
+        
+        tr, td{
+            padding: 12px 15px;
+            border: 2px solid currentColor;
+        }
+        
+        td:first-child {
+            font-weight: 600;
+            white-space: nowrap;
+            background-color: rgba(128, 128, 128, 0.05);
+        }
+
+        .x-break {
+            width: 100%;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .tableFooter{text-align: center; font-style: italic;}
+        .tableFooter:hover{background-color: rgba(255, 0, 255, 0.2) !important;}
+        
+        .calendar-section {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin: 30px 0 50px;
+        }
+        
+        .containerCalendar {
+            height: auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 450px;
+            margin: 30px auto;
+        }
+        
+        .date-time {
+            text-align: start;
+            margin-bottom: 30px;
+        }
+        
+        .time {
+            font-size: clamp(28px, 6vw, 40px);
+            font-weight: bold;
+            margin-bottom: 2px;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+        
+        .date {
+            font-size: clamp(16px, 4vw, 20px);
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+        
+        .schedule-header {margin-bottom: 20px;}
+        
+        .schedule-header h2 {
+            font-size: clamp(24px, 5vw, 32px);
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+        
+        .schedule-header p {
+            font-size: clamp(14px, 3vw, 18px);
+            opacity: 0.8;
+            word-break: break-word;
+        }
+        
+        .calendar {width: 100%;}
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .calendar-header h3 {
+            margin: 0;
+            font-size: clamp(16px, 4vw, 18px);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .calendar-header button {
+            background: #333;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-header button:hover {
+            background: #555;
+            transform: scale(1.05);
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: clamp(12px, 3vw, 14px);
+            gap: 2px;
+        }
+        
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+        }
+        
+        .day {
+            text-align: center;
+            padding: 8px 4px;
+            border-radius: 8px;
+            cursor: default;
+            font-size: clamp(12px, 3vw, 14px);
+            min-width: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .day.today {
+            background: #333;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .day.other-month {
+            opacity: 0.3;
+        }
+        
+        @media (max-width: 400px) {
+            .containerCalendar {
+                padding: 15px 10px;
+            }
+            
+            .day {
+                padding: 5px 2px;
+                font-size: 11px;
+            }
+            
+            .calendar-header button {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+            
+            .weekdays {
+                font-size: 11px;
+            }
+        }
+        
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .containerCalendar {
+                max-width: 500px;
+            }
+            
+            .day {
+                padding: 10px 5px;
+                font-size: 15px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .container { 
+                padding: 0.5rem; 
+            }
+            
+            .table-wrapper { 
+                /* border-radius: 8px;  */
+                margin: 15px 0;
+            }
+            
+            td { 
+                padding: 8px 10px; 
+                font-size: 14px;
+            }
+            
+            .theme-switch button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+
+    </style>
+</head>
+<body class="light-theme">
+    <div class="container">
+        <!-- Theme Switcher - Single Button -->
+        <div class="theme-switch-wrapper">
+            <div class="theme-switch">
+                <button id="themeToggleBtn" onclick="cycleTheme()">LIGHT</button>
+            </div>
+        </div>
+
+        <!-- Текущие дата и время -->
+        <div class="date-time">
+            <div class="time" id="currentTime"></div>
+            <div class="date" id="currentDate"></div>
+        </div>
+        
+        <!-- Заголовок расписания -->
+        <div class="schedule-header">
+            <h2>PDP school</h2>
+            <p>Grade 9A russ · weekly timetable</p>
+        </div>
+        
+        <!-- Обертка для горизонтального скролла таблицы -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <td></td>
+                        <td><b>Monday</b></td>
+                        <td><b>Tuesday</b></td>
+                        <td><b>Wednesday</b></td>
+                        <td><b>Thursday</b></td>
+                        <td><b>Friday</b></td>
+                        <td><b>Saturday</b></td>
+                        <td><b>Sunday</b></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>9:00-9:45</td>
+                        <td rowspan="2">English Language</td>
+                        <td rowspan="2">Java</td>
+                        <td>Graph Desing</td>
+                        <td rowspan="2">Maths/SAT</td>
+                        <td rowspan="2">Java</td>
+                        <td rowspan="4">Gym</td>
+                        <td rowspan="4">Gym</td>
+                    </tr>
+                    <tr>
+                        <td>9:55-10:40</td>
+                        <td>Physics</td>
+                    </tr>
+                    <tr>
+                        <td>10:50-11:35</td>
+                        <td>Russian Language / Literature</td>
+                        <td rowspan="2">English Language</td>
+                        <td>Physics</td>
+                        <td>PE</td>
+                        <td rowspan="2">Maths</td>
+                    </tr>
+                    <tr>
+                        <td>11:45-12:30</td>
+                        <td>History</td>
+                        <td>PE</td>
+                        <td>Leadership</td>
+                    </tr>
+                    <tr>
+                        <td>12:30-13:30</td>
+                        <td class="x-break" colspan="7">⸻ BREAK ⸻</td>
+                    </tr>
+                    <tr>
+                        <td>13:30-14:15</td>
+                        <td rowspan="2">Java</td>
+                        <td>History</td>
+                        <td rowspan="2">Java</td>
+                        <td rowspan="2">Java</td>
+                        <td rowspan="2">English Language</td>
+                        <td rowspan="4">Gym</td>
+                        <td rowspan="4">Gym</td>
+                    </tr>
+                    <tr>
+                        <td>14:25-15:10</td>
+                        <td>Physics</td>
+                    </tr>
+                    <tr>
+                        <td>15:35-16:20</td>
+                        <td>Uzbek Language</td>
+                        <td rowspan="2">Maths</td>
+                        <td rowspan="2">English Language</td>
+                        <td rowspan="2">Maths</td>
+                        <td>Physics</td>
+                    </tr>
+                    <tr>
+                        <td>16:30-17:15</td>
+                        <td>Science</td>
+                        <td>Uzbek Language</td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" class="tableFooter" onmouseover="this.style.backgroundColor='rgba(220, 20, 60, 0.2)!important';">Schedule made via FET 7.4.3 on 09/03/2026</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Календарь - адаптивная секция -->
+        <div class="calendar-section">
+            <div class="containerCalendar">
+                <div class="calendar" id="calendar"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Сохраняем текущую дату для календаря
+        let currentCalendarDate = new Date();
+        
+        // Theme toggle function - switch between light and dark
+        function cycleTheme() {
+            const body = document.body;
+            const themeBtn = document.getElementById('themeToggleBtn');
+            
+            // Toggle between light and dark
+            if (body.classList.contains('light-theme')) {
+                // Light -> Dark
+                body.classList.remove('light-theme');
+                body.classList.add('dark-theme');
+                themeBtn.innerHTML = 'DARK';
+                localStorage.setItem('theme', 'dark');
+            } 
+            else {
+                // Dark -> Light
+                body.classList.remove('dark-theme');
+                body.classList.add('light-theme');
+                themeBtn.innerHTML = 'LIGHT';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Load saved theme from localStorage
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const body = document.body;
+            const themeBtn = document.getElementById('themeToggleBtn');
+            
+            // Remove all theme classes
+            body.classList.remove('light-theme', 'dark-theme');
+            
+            // Apply saved theme
+            if (savedTheme === 'light') {
+                body.classList.add('light-theme');
+                themeBtn.innerHTML = 'LIGHT';
+            } else if (savedTheme === 'dark') {
+                body.classList.add('dark-theme');
+                themeBtn.innerHTML = 'DARK';
+            } else {
+                body.classList.add('light-theme');
+                themeBtn.innerHTML = 'LIGHT';
+            }
+        }
+
+        // Обновление времени
+        function updateTime() {
+            const now = new Date();
+            
+            // Время
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('currentTime').textContent = hours + ':' + minutes + ':' + seconds;
+            
+            // Дата
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            const dayName = days[now.getDay()];
+            const day = now.getDate();
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+            
+            // Первая буква заглавная
+            const formattedDay = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+            
+            document.getElementById('currentDate').textContent = formattedDay + ', ' + day + ' ' + month + ' ' + year;
+        }
+        
+        // Рендер календаря с переданной датой
+        function renderCalendar() {
+            renderMonth(currentCalendarDate);
+        }
+        
+        function renderMonth(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            let startingDay = firstDay.getDay();
+            // Преобразуем воскресенье (0) в 7 для правильного отображения (понедельник - первый день)
+            if (startingDay === 0) startingDay = 7;
+            
+            const monthLength = lastDay.getDate();
+            
+            // Форматируем название месяца и год
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            let html = `
+                <div class="calendar-header">
+                    <button onclick="changeMonth(-1)" aria-label="Previous month">←</button>
+                    <h3>${monthNames[month]} ${year}</h3>
+                    <button onclick="changeMonth(1)" aria-label="Next month">→</button>
+                </div>
+                <div class="weekdays">
+                    <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+                </div>
+                <div class="days">
+            `;
+            
+            // Пустые ячейки для дней предыдущего месяца
+            for (let i = 1; i < startingDay; i++) {
+                html += '<div class="day other-month"></div>';
+            }
+            
+            // Дни текущего месяца
+            const today = new Date();
+            for (let i = 1; i <= monthLength; i++) {
+                const isToday = i === today.getDate() && 
+                               month === today.getMonth() && 
+                               year === today.getFullYear();
+                
+                let classes = 'day';
+                if (isToday) classes += ' today';
+                
+                html += `<div class="${classes}">${i}</div>`;
+            }
+            
+            // Добавляем пустые ячейки в конце для выравнивания сетки (если нужно)
+            const totalCells = Math.ceil((startingDay - 1 + monthLength) / 7) * 7;
+            const remainingCells = totalCells - (startingDay - 1 + monthLength);
+            
+            for (let i = 0; i < remainingCells; i++) {
+                html += '<div class="day other-month"></div>';
+            }
+            
+            html += '</div>';
+            document.getElementById('calendar').innerHTML = html;
+        }
+        
+        function changeMonth(delta) {
+            // Изменяем месяц на delta (+1 или -1)
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+            // Перерисовываем календарь с обновленной датой
+            renderMonth(currentCalendarDate);
+        }
+        
+        // Запуск
+        updateTime();
+        renderCalendar();
+        setInterval(updateTime, 1000);
+        
+        // Load theme after DOM is ready
+        document.addEventListener('DOMContentLoaded', loadTheme);
+        
+        // Добавляем обработчик resize для обновления календаря при изменении размера окна (опционально)
+        window.addEventListener('resize', function() {
+            // Просто перерисовываем календарь для адаптации размеров
+            renderMonth(currentCalendarDate);
+        });
+    </script>
+</body>
+</html>

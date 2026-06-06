@@ -4,6 +4,7 @@ A modern, responsive web application for displaying weekly class schedules with 
 
 <!-- ![Schedule App Preview](image.png) -->
 <!-- // -- hellcat redeye image -->
+<!-- // -- hellcat redeye image -->
 
 ## ✨ Features
 

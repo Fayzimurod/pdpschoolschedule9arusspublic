@@ -3,6 +3,7 @@
 A modern, responsive web application for displaying weekly class schedules with real-time clock and interactive calendar. Built with pure HTML, CSS, and JavaScript.
 <!-- <p>
 commit
+commit
 </p> -->
 ## ✨ Features
 

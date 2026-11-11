@@ -1,4 +1,4 @@
-<!-- <p>1st commit</p> --> 
+<!-- <p>1st commit, 2nd commit</p> --> 
 
 # 📅 Interactive Schedule Web App
 
